@@ -4,14 +4,16 @@ import './index.css';
 import App from './App';
 import { Provider } from 'react-redux';
 import { applyMiddleware, createStore } from 'redux';
-import rootReducer from './modules';
+import rootReducer, { rootSaga } from './modules';
 import logger from 'redux-logger';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import ReduxThunk from 'redux-thunk';
 import { BrowserRouter, Router } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
+import createSagaMiddleware from 'redux-saga';
 
 const customHistory = createBrowserHistory();
+const sagaMiddleware = createSagaMiddleware(); // 사가 미들웨어를 만듭니다.
 
 const store = createStore(
   rootReducer,
@@ -19,10 +21,13 @@ const store = createStore(
   composeWithDevTools(
     applyMiddleware(
       ReduxThunk.withExtraArgument({ history: customHistory }),
+      sagaMiddleware, // 사가 미들웨어를 적용하고
       logger,
     ),
   ),
 );
+
+sagaMiddleware.run(rootSaga);
 
 ReactDOM.render(
   <Router history={customHistory}>
